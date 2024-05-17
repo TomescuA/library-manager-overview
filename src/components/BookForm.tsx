@@ -1,55 +1,37 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { TextField, Button, Container, Typography } from '@mui/material';
-import { Book } from '../types/book';
-import { useAddBook } from '../hooks/useAddBook';
-import { useEditBook } from '../hooks/useEditBook';
+import { BookFormProps } from '../types/book';
 
-const AddBookForm: React.FC<{ editBook?: Book; clearEdit: () => void }> = ({ editBook, clearEdit }) => {
-  const { addNewBook } = useAddBook();
-  const { editExistingBook } = useEditBook();
+const validateSchema = Yup.object({
+  title: Yup.string().required('Required book title'),
+  author: Yup.string().required('Required book author'),
+  genre: Yup.string().required('Required book genre'),
+  description: Yup.string().required('Required book description'),
+});
 
+
+
+const AddBookForm: React.FC<BookFormProps> = ({ onSubmit, title, genre, author, description, formTitle, formSubmitButtonTitle }) => {
   const formik = useFormik({
     initialValues: {
-      title: '',
-      author: '',
-      genre: '',
-      description: '',
+      title: title || "",
+      author: author || "",
+      genre: genre || "",
+      description: description || "",
     },
-    validationSchema: Yup.object({
-      title: Yup.string().required('Required'),
-      author: Yup.string().required('Required'),
-      genre: Yup.string().required('Required'),
-      description: Yup.string().required('Required'),
-    }),
-    onSubmit: async (values, { resetForm }) => {
-      if (editBook) {
-        await editExistingBook(editBook.id, values);
-        clearEdit();
-      } else {
-        await addNewBook(values);
-      }
-      resetForm();
-    },
+    validationSchema: validateSchema,
+    onSubmit,
   });
 
-  useEffect(() => {
-    if (editBook) {
-      formik.setValues({
-        title: editBook.title,
-        author: editBook.author,
-        genre: editBook.genre,
-        description: editBook.description,
-      });
-    }
-  }, [editBook]);
-
   return (
-    <Container>
-      <Typography variant="h6">{editBook ? 'Edit Book' : 'Add New Book'}</Typography>
+    <Container maxWidth="sm">
+      <Typography color="text.secondary"  variant="h6">{formTitle}</Typography>
       <form onSubmit={formik.handleSubmit}>
         <TextField
+          sx={{marginBottom: 2}}
+          size="small"
           fullWidth
           id="title"
           name="title"
@@ -60,6 +42,8 @@ const AddBookForm: React.FC<{ editBook?: Book; clearEdit: () => void }> = ({ edi
           helperText={formik.touched.title && formik.errors.title}
         />
         <TextField
+          sx={{marginBottom: 2}}
+          size="small"
           fullWidth
           id="author"
           name="author"
@@ -70,6 +54,8 @@ const AddBookForm: React.FC<{ editBook?: Book; clearEdit: () => void }> = ({ edi
           helperText={formik.touched.author && formik.errors.author}
         />
         <TextField
+          sx={{marginBottom: 2}}
+          size="small"
           fullWidth
           id="genre"
           name="genre"
@@ -80,6 +66,8 @@ const AddBookForm: React.FC<{ editBook?: Book; clearEdit: () => void }> = ({ edi
           helperText={formik.touched.genre && formik.errors.genre}
         />
         <TextField
+          sx={{marginBottom: 2}}
+          size="small"
           fullWidth
           id="description"
           name="description"
@@ -90,7 +78,7 @@ const AddBookForm: React.FC<{ editBook?: Book; clearEdit: () => void }> = ({ edi
           helperText={formik.touched.description && formik.errors.description}
         />
         <Button color="primary" variant="contained" fullWidth type="submit">
-          {editBook ? 'Update Book' : 'Add Book'}
+          {formSubmitButtonTitle}
         </Button>
       </form>
     </Container>

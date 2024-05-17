@@ -1,3 +1,3 @@
 export enum keys {
-    Books= '/books'
+  Books= '/books'
 }

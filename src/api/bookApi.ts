@@ -11,8 +11,8 @@ export const addBook = async (book: Omit<Book, 'id'>): Promise<Book> => {
   return response.data;
 };
 
-export const editBook = async (id: number, book: Partial<Book>): Promise<Book> => {
-  const response = await axiosInstance.put(`/books/${id}`, book);
+export const updateBook = async (request: Book): Promise<Book> => {
+  const response = await axiosInstance.put(`/books/${request.id}`, request);
   return response.data;
 };
 

@@ -1,44 +1,35 @@
-import React, { useEffect, useState } from 'react';
-import { Container, Typography, Box, Button } from '@mui/material';
-import { useNavigate, useParams } from 'react-router-dom';
-import AddBookForm from '../components/AddBookForm';
-import { Book } from '../types/book';
-import { getBooks } from '../api/bookApi';
+import React from 'react';
+import { Container, Typography, Box } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+import AddBookForm, { FormValues } from '../components/BookForm';
+import officeImage from '../assets/office2.jpg'
+import { useAddBook } from '../hooks/useAddBook';
+import Hero from '../components/Hero';
 
 const AddBookPage: React.FC = () => {
   const navigate = useNavigate();
-  const { id } = useParams<{ id: string }>();
-  const [editBook, setEditBook] = useState<Book | null>(null);
+  const [triggerAddBook, {isLoading}] = useAddBook();
 
-  useEffect(() => {
-    if (id) {
-      // Fetch the book details for editing
-      getBooks().then((books) => {
-        const bookToEdit = books.find((book) => book.id === parseInt(id));
-        if (bookToEdit) {
-          setEditBook(bookToEdit);
-        }
-      });
-    }
-  }, [id]);
-
-  const clearEdit = () => {
-    setEditBook(null);
-    navigate('/');
-  };
+  const onSubmit = async (values: FormValues) => {
+    await triggerAddBook(values);
+    navigate(-1);
+  }
 
   return (
-    <Container>
-      <Box my={4}>
-        <Typography variant="h4" component="h3" gutterBottom>
-          {editBook ? 'Edit Book' : 'Add New Book'}
+    <Hero url={officeImage}>
+      <Container>
+        <Typography sx={{fontSize: {xs:'1.5rem', sm: '1.5rem', md: '2.125rem' }}} align='center' variant="h4" component="h3" gutterBottom>
+          Add New Book {isLoading ? 'Updating...' : ''}
         </Typography>
-        <Button variant="contained" color="secondary" onClick={() => navigate('/')}>
-          Back to Book List
-        </Button>
-        <AddBookForm editBook={editBook} clearEdit={clearEdit} />
-      </Box>
-    </Container>
+        <Box my={4} >
+          <AddBookForm
+            formTitle={`Add New Book`}
+            formSubmitButtonTitle="Add Book"
+            onSubmit={onSubmit}
+          />
+        </Box>
+      </Container>
+    </Hero>
   );
 };
 
